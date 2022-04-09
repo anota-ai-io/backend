@@ -28,28 +28,12 @@ app.get(["/", "/api"], async (req, res) => {
   });
 });
 
-app.get("/connection", async (req, res) => {
-  try {
-    await sequelize.authenticate();
-
-    console.log("Conexão realizada com");
-
-    return res.status(200).json({
-      message: "Sucesso",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: error.message,
-    });
-  }
-});
-
 app.all("*", async (req, res) => {
   return res.status(404).json({
     status: "error",
     code: NotFound,
     message: "A rota solicitada não foi encontrada ou implementada.",
-    documentation: "https://documenter.getpostman.com/view/19545370/UVkmQGwd",
+    documentation: "https://documenter.getpostman.com/view/19545370/UVyxRZXu",
   });
 });
 
