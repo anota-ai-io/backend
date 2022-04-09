@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const mail = require("../services/mail");
 const { fileName } = require("../modules/debug");
-const { models } = require("../modules/sequelize");
+const { models, sequelize } = require("../modules/sequelize");
 
 const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
 const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
@@ -77,12 +77,13 @@ module.exports = {
     }
 
     // Adquirir dados do usuário informado
-    const user = await prisma.user.findFirst({
+    const user = await models.user.findOne({
       where: {
         id: parseInt(userId),
         email: email,
         password: password,
       },
+      raw: true,
     });
 
     if (user) {
@@ -93,18 +94,31 @@ module.exports = {
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
-        const deleted = await prisma.$transaction([
-          prisma.refreshToken.deleteMany({
-            where: {
-              userId: parseInt(userId),
+        const deleted = await sequelize.transaction(async (t) => {
+          await models.refreshToken.destroy(
+            {
+              where: {
+                userId: parseInt(userId),
+              },
             },
-          }),
-          prisma.user.delete({
-            where: {
-              id: parseInt(userId),
+            {
+              transaction: t,
+            }
+          );
+
+          await models.user.destroy(
+            {
+              where: {
+                id: parseInt(userId),
+              },
             },
-          }),
-        ]);
+            {
+              transaction: t,
+            }
+          );
+
+          return true;
+        });
 
         // Verifica sucesso da exclusão
         if (deleted) {
@@ -138,15 +152,17 @@ module.exports = {
   },
 
   async read(token, userId) {
-    const user = await prisma.user.findUnique({
+    const user = await models.user.findOne({
       where: {
         id: userId,
       },
+      raw: true,
     });
 
     if (user) {
       // Remover o campo de senha do retorno
       delete user["password"];
+      delete user["activationCode"];
 
       // Verificar permissão de acesso aos dados desse usuário
       if (user["id"] == token["userId"] && user["email"] === token["email"]) {

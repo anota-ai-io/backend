@@ -39,7 +39,7 @@ app.all("*", async (req, res) => {
 
 (async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     app.listen(process.env.EXTERNAL_PORT);
   } catch (error) {
     console.error(error);

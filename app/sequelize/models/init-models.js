@@ -1,11 +1,16 @@
 var DataTypes = require("sequelize").DataTypes;
+var _refreshToken = require("./refreshToken");
 var _user = require("./user");
 
 function initModels(sequelize) {
+  var refreshToken = _refreshToken(sequelize, DataTypes);
   var user = _user(sequelize, DataTypes);
 
+  refreshToken.belongsTo(user, { as: "user", foreignKey: "userId"});
+  user.hasMany(refreshToken, { as: "refreshTokens", foreignKey: "userId"});
 
   return {
+    refreshToken,
     user,
   };
 }
