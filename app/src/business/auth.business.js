@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const validator = require("validator");
 
+const { models } = require("../modules/sequelize");
+
 const { failure, unauthorized, ok } = require("../modules/http");
 const {
   Unauthorized,
@@ -20,12 +22,13 @@ module.exports = {
     }
 
     // Verificação de usuário e senha contra o banco de dados
-    // const user = await prisma.user.findFirst({
-    //   where: {
-    //     email: email,
-    //     password: password,
-    //   },
-    // });
+    const user = await models.user.findOne({
+      where: {
+        email: email,
+        password: password,
+      },
+      raw: true,
+    });
 
     if (user) {
       // Dados de usuário encontrados, conferir por status da conta
@@ -64,25 +67,29 @@ module.exports = {
 
   async verifyAccount(userId, email, activationCode) {
     // Buscar os dados de usuário do banco de dados
-    // const user = await prisma.user.findFirst({
-    //   where: {
-    //     id: userId,
-    //     email: email,
-    //     activationCode: activationCode,
-    //     active: false,
-    //   },
-    // });
+    const user = await models.user.findOne({
+      where: {
+        id: userId,
+        email,
+        activationCode,
+        active: false,
+      },
+      raw: true,
+    });
 
     if (user) {
       // Usuario encontrado, realizar modificação de ativação
-      //   const activeUser = await prisma.user.updateMany({
-      //     where: {
-      //       id: userId,
-      //       activationCode: activationCode,
-      //     },
-      //     data: { active: true },
-      //   });
-
+      const activeUser = await models.user.update(
+        {
+          active: true,
+        },
+        {
+          where: {
+            id: userId,
+            activationCode,
+          },
+        }
+      );
       // Os objetos a seguir são objetos simples, e não objetos http
       if (activeUser) {
         return {
@@ -129,15 +136,13 @@ module.exports = {
     const expString = exp.toString().slice(0, 10);
 
     // Salvar o refresh token no banco de dados
-    // const refresh = await prisma.refreshToken.create({
-    //   data: {
-    //     id: randomToken,
-    //     email: payload["email"],
-    //     userId: payload["userId"],
-    //     iat: iatString,
-    //     exp: expString,
-    //   },
-    // });
+    const refresh = await models.refreshToken.create({
+      id: randomToken,
+      email: payload["email"],
+      userId: payload["userId"],
+      iat: iatString,
+      exp: expString,
+    });
 
     if (refresh) {
       return {
@@ -163,12 +168,13 @@ module.exports = {
         const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
         // Token validado com sucesso, extrair dados de usuário
-        // const user = await prisma.user.findFirst({
-        //   where: {
-        //     id: parseInt(decoded["userId"]),
-        //     email: decoded["email"],
-        //   },
-        // });
+        const user = await models.user.findOne({
+          where: {
+            id: parseInt(decoded["userId"]),
+            email: decoded["email"],
+          },
+          raw: true,
+        });
 
         if (user) {
           return decoded;

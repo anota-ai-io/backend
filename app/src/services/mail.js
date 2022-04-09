@@ -11,19 +11,12 @@ module.exports = {
       let html = (await fs.readFile("src/html/invite.html")).toString();
 
       // Links
-
-      let logoUrl = `${process.env.PRODUCTION_URL}/images/library_icon.png`;
-      let logoGithub = `${process.env.PRODUCTION_URL}/images/github.png`;
-      // let activationLink = `${process.env.PRODUCTION_URL}/api/auth/verify?id=${userId}&email=${email}&code=${activationCode}`;
-
       let activationLink =
         process.env.NODE_ENV === "production"
           ? `${process.env.PRODUCTION_URL}/api/auth/verify?id=${userId}&email=${email}&code=${activationCode}`
           : `http://localhost:${process.env.API_LOCAL_PORT}/api/auth/verify?id=${userId}&email=${email}&code=${activationCode}`;
 
       // Realiza substituições
-      html = html.replace("#LOGO_URL", logoUrl);
-      html = html.replace("#GITHUB_ICON", logoGithub);
       html = html.replace("#USER_EMAIL", email);
       html = html.replace("#USER_NAME", name.split(" ")[0]);
       html = html.replace("#ACTIVATION_LINK", activationLink);
