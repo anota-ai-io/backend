@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/anota-ai-io/backend#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.2",
     "axios": "^0.26.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.0",

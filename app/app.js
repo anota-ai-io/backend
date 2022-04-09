@@ -37,6 +37,15 @@ app.all("*", async (req, res) => {
   });
 });
 
+(async () => {
+  try {
+    await sequelize.sync({ force: true });
+    app.listen(process.env.EXTERNAL_PORT);
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
 app.use(customErrorHandler);
 
 module.exports = app;
