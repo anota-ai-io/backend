@@ -8,8 +8,9 @@ const AuthController = require("./controllers/auth.controller");
 const protectedRoute = require("./middlewares/auth");
 
 // Rotas de controle do Sequelize
-routes.get("/sequelize/connection", protectedRoute,  SequelizeController.connection);
+routes.get("/sequelize/connection", protectedRoute, SequelizeController.connection);
 routes.get("/sequelize/generate", protectedRoute, SequelizeController.generate);
+routes.get("/sequelize/force", protectedRoute, SequelizeController.force);
 
 // Rotas de Autenticação
 routes.post("/auth/login", AuthController.login);

@@ -37,14 +37,25 @@ app.all("*", async (req, res) => {
   });
 });
 
-(async () => {
-  try {
-    await sequelize.sync({ force: false });
-    app.listen(process.env.EXTERNAL_PORT);
-  } catch (error) {
-    console.error(error);
-  }
-})();
+// (async () => {
+//   console.log("Iniciando configuração do banco de dados.");
+//   try {
+//     // try {
+//     //   await sequelize.createSchema("public");
+//     //   console.log("Schema criado com sucesso.");
+//     // } catch (error) {
+//     //   console.log("O banco de dados já possui o schema criado.");
+//     // }
+
+//     console.log("Sincronizando banco de dados.");
+
+//     await sequelize.sync({ force: true });
+
+//     console.log("Banco de dados sincronizado com sucesso.");
+//   } catch (error) {
+//     console.error("Erro ao sincronizar banco de dados:", error);
+//   }
+// })();
 
 app.use(customErrorHandler);
 
