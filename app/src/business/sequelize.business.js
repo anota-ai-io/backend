@@ -45,4 +45,17 @@ module.exports = {
 
     return response;
   },
+
+  async force() {
+    console.log("Iniciando push do banco de dados.");
+    await sequelize.sync({ force: true });
+    console.log("Push do banco de dados finalizado.");
+
+    return ok({
+      status: "ok",
+      response: {
+        message: "Push do banco de dados finalizado.",
+      },
+    });
+  },
 };

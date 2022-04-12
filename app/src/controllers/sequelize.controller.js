@@ -21,7 +21,7 @@ module.exports = {
 
   async force(req, res, next) {
     try {
-      const response = await sequelizeBusiness.generate();
+      const response = await sequelizeBusiness.force();
       res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
