@@ -24,7 +24,7 @@ module.exports = {
       const validationResult = validation.run(rules);
 
       if (validationResult["status"] === "error") {
-        res.status(400).json(validationResult);
+        return res.status(400).json(validationResult);
       }
 
       // Validação dos parâmetros finalizada, realiza procedimento de login
