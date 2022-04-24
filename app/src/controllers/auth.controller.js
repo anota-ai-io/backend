@@ -6,6 +6,7 @@ const PasswordValidator = require("../validators/user/password.rules");
 const EmailValidator = require("../validators/user/email.rules");
 const ActivationValidator = require("../validators/user/activation.rules");
 const UserIdValidator = require("../validators/user/id.rules");
+const RefreshTokenValidator = require("../validators/auth/refresh.rules");
 
 const validation = require("../modules/validation");
 
@@ -23,7 +24,7 @@ module.exports = {
       const validationResult = validation.run(rules);
 
       if (validationResult["status"] === "error") {
-        res.status(400).json(validationResult);
+        return res.status(400).json(validationResult);
       }
 
       // Validação dos parâmetros finalizada, realiza procedimento de login
@@ -73,9 +74,23 @@ module.exports = {
 
   async refreshToken(req, res, next) {
     try {
-      return ok({
-        message: "ok",
-      });
+      // Aquisição do token
+      const { token } = req;
+
+      // Aquisição e validação dos parâmetros
+      const { refreshToken } = req.body;
+
+      const rules = [[refreshToken, RefreshTokenValidator]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AuthBusiness.refreshToken(token, refreshToken);
+
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

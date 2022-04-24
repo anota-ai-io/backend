@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  API_LOCAL_PORT: ${{ secrets.API_LOCAL_PORT }}
+  JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
+  PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+  SEND_GRID_API: ${{ secrets.SEND_GRID_API }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: anotaai
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create env file
+        run: |
+          touch .env
+          echo API_LOCAL_PORT=${{ secrets.API_LOCAL_PORT }} >> .env
+          echo JWT_TOKEN_SECRET=${{ secrets.JWT_TOKEN_SECRET }} >> .env
+          echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
+          echo SEND_GRID_API=${{ secrets.SEND_GRID_API }} >> .env
+      - name: Build the Docker test image
+        run: docker-compose -f docker-compose.test.yml up --exit-code-from backend_test --build

@@ -4,7 +4,7 @@ module.exports = {
   async connection(req, res, next) {
     try {
       const response = await sequelizeBusiness.connection();
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -13,7 +13,7 @@ module.exports = {
   async generate(req, res, next) {
     try {
       const response = await sequelizeBusiness.generate();
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -22,7 +22,7 @@ module.exports = {
   async force(req, res, next) {
     try {
       const response = await sequelizeBusiness.force();
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

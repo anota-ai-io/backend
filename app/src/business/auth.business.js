@@ -5,13 +5,14 @@ const validator = require("validator");
 
 const { models } = require("../modules/sequelize");
 
-const { failure, unauthorized, ok } = require("../modules/http");
+const { failure, unauthorized, ok, forbidden } = require("../modules/http");
 const {
   Unauthorized,
   AccountNotVerified,
   IncorrectParameter,
   DatabaseFailure,
   JWTFailure,
+  Forbidden,
 } = require("../modules/codes");
 
 module.exports = {
@@ -35,7 +36,7 @@ module.exports = {
       if (user["active"]) {
         // Construir o payload do token com os dados necessários
         const payload = {
-          userId: parseInt(user["id"]),
+          id: parseInt(user["id"]),
           email: user["email"],
           name: user["name"],
         };
@@ -114,8 +115,93 @@ module.exports = {
     }
   },
 
-  async refreshToken() {
-    // ...
+  async refreshToken(token, refreshToken) {
+    const userId = parseInt(token["id"]);
+    const userEmail = token["email"];
+    const userName = token["name"];
+
+    const refresh = await models.refreshToken.findOne({
+      where: {
+        id: refreshToken,
+      },
+      raw: true,
+    });
+
+    console.log(refresh);
+
+    console.log(token, refreshToken);
+
+    console.log("-------");
+    console.log(userId, typeof userId, userEmail, typeof userEmail);
+    console.log(
+      refresh["userId"],
+      typeof parseInt(refresh["userId"]),
+      refresh["email"],
+      typeof refresh["email"]
+    );
+
+    if (refresh) {
+      // Verificação de autenticidade do refresh token informado
+      if (userId !== parseInt(refresh["userId"]) || userEmail !== refresh["email"]) {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message:
+            "Os dados presentes no token não são válidos com os dados presentes no refresh token.",
+        });
+      }
+
+      // Verificações de validade do refresh token informado
+      const currentTime = dayjs().valueOf().toString().slice(0, 10);
+
+      if (currentTime < parseInt(refresh["iat"])) {
+        return ok({
+          status: "error",
+          code: RefreshTokenNotBefore,
+          message:
+            "O horário de criação do refresh token informado é anterior ao horário atual, ajuste o horário do seu dispositivo.",
+        });
+      }
+
+      if (currentTime > parseInt(refresh["exp"])) {
+        return ok({
+          status: "error",
+          code: RefreshTokenExpired,
+          message: "O refresh token informado expirou, realize o login novamente.",
+        });
+      }
+
+      // Todas as validações foram executadas, criar novo token de acesso
+      const newToken = await this.createToken({
+        id: userId,
+        email: userEmail,
+        name: userName,
+      });
+
+      if (newToken["status"] === "ok") {
+        // Token criado com sucesso, aplicar Refresh Token Rotation
+        await models.refreshToken.destroy({
+          where: {
+            id: refreshToken,
+          },
+        });
+
+        // Retornar novos tokens de acesso que foram criados
+        return ok(newToken);
+      } else {
+        return ok({
+          status: "ok",
+          code: JWTFailure,
+          message: "Erro durante a criação de novo token de acesso através do refresh token.",
+        });
+      }
+    } else {
+      return ok({
+        status: "error",
+        code: InvalidRefreshToken,
+        message: "O refresh token informado não foi encontrado na base de dados de autenticação.",
+      });
+    }
   },
 
   async createToken(payload) {
@@ -139,7 +225,7 @@ module.exports = {
     const refresh = await models.refreshToken.create({
       id: randomToken,
       email: payload["email"],
-      userId: payload["userId"],
+      userId: payload["id"],
       iat: iatString,
       exp: expString,
     });
@@ -170,7 +256,7 @@ module.exports = {
         // Token validado com sucesso, extrair dados de usuário
         const user = await models.user.findOne({
           where: {
-            id: parseInt(decoded["userId"]),
+            id: parseInt(decoded["id"]),
             email: decoded["email"],
           },
           raw: true,
