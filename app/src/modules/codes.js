@@ -28,4 +28,22 @@ module.exports = {
 
   // Falhas com a manipulação e criação de token JWT
   JWTFailure: "JWTFailure",
+
+  // Token JWT com tempo de duração expirado
+  JWTExpired: "JWTExpired",
+
+  // Horário atual de verificação do token é menor que o de expiração
+  JWTNotBefore: "JWTNotBefore",
+
+  // O Refresh Token informado não foi localizado
+  InvalidRefreshToken: "InvalidRefreshToken",
+
+  // O Refresh Token informado expirou, é necessário realizar o login novamente
+  RefreshTokenExpired: "RefreshTokenExpired",
+
+  // O horário de verificação é anterior ao horário de "issued" do refresh token
+  RefreshTokenNotBefore: "RefreshTokenNotBefore",
+
+  // A página solicitada não retornou nenhum resultado
+  Empty: "Empty",
 };

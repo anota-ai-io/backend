@@ -5,8 +5,22 @@ const mail = require("../services/mail");
 const { fileName } = require("../modules/debug");
 const { models, sequelize } = require("../modules/sequelize");
 
-const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
-const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
+const {
+  conflict,
+  created,
+  failure,
+  ok,
+  forbidden,
+  notFound,
+  unauthorized,
+} = require("../modules/http");
+const {
+  EmailAlreadyInUse,
+  DatabaseFailure,
+  UserNotFound,
+  Forbidden,
+  Unauthorized,
+} = require("../modules/codes");
 
 module.exports = {
   async create(email, name, password) {
@@ -16,8 +30,6 @@ module.exports = {
       },
       raw: true,
     });
-
-    console.log(user);
 
     if (user) {
       return conflict({
@@ -89,7 +101,7 @@ module.exports = {
     if (user) {
       // Verifica veracidade dos dados
       if (
-        user["id"] == token["userId"] &&
+        user["id"] == token["id"] &&
         user["email"] == token["email"] &&
         user["password"] == password
       ) {
@@ -139,14 +151,14 @@ module.exports = {
         return forbidden({
           status: "error",
           code: Forbidden,
-          message: "O usuário informado não possui permissão para completar esta ação.",
+          message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
         });
       }
     } else {
-      return ok({
+      return unauthorized({
         status: "error",
-        code: UserNotFound,
-        message: "O usuário informado não foi encontrado na base de dados.",
+        code: Unauthorized,
+        message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
       });
     }
   },
@@ -165,7 +177,7 @@ module.exports = {
       delete user["activationCode"];
 
       // Verificar permissão de acesso aos dados desse usuário
-      if (user["id"] == token["userId"] && user["email"] === token["email"]) {
+      if (user["id"] == token["id"] && user["email"] === token["email"]) {
         return ok({
           status: "ok",
           response: {
