@@ -2,6 +2,7 @@ const PasswordValidator = require("../validators/user/password.rules");
 const EmailValidator = require("../validators/user/email.rules");
 const NameValidator = require("../validators/user/name.rules");
 const UserIdValidator = require("../validators/user/id.rules");
+const UserNameValidator = require("../validators/user/userName.rules");
 
 const UserBusiness = require("../business/user.business");
 
@@ -11,13 +12,14 @@ module.exports = {
   async create(req, res, next) {
     try {
       // Aquisição dos parâmetros
-      const { name, email, password } = req.body;
+      const { name, email, password, userName } = req.body;
 
       // Construir regras de validação
       const rules = [
         [name, NameValidator],
         [email, EmailValidator],
         [password, PasswordValidator],
+        [userName, UserNameValidator],
       ];
 
       // Validação dos parâmetros
@@ -28,7 +30,7 @@ module.exports = {
       }
 
       // Validação dos parâmetros finalizada
-      const response = await UserBusiness.create(email, name, password);
+      const response = await UserBusiness.create(email, name, password, userName);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

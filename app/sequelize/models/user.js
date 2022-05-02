@@ -27,6 +27,10 @@ module.exports = function(sequelize, DataTypes) {
     activationCode: {
       type: DataTypes.STRING(16),
       allowNull: true
+    },
+    userName: {
+      type: DataTypes.STRING(64),
+      allowNull: true
     }
   }, {
     sequelize,
