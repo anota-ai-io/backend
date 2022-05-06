@@ -11,6 +11,8 @@ module.exports = {
   // Email já foi cadastrado por outro usuário
   EmailAlreadyInUse: "EmailAlreadyInUse",
 
+  UserNameAlreadyInUser: "UserNameAlreadyInUse",
+
   // Dados de usuário não foram encontrados na base de dados
   UserNotFound: "UserNotFound",
 

@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const validator = require("validator");
+const { Op } = require("sequelize");
 
 const mail = require("../services/mail");
 const { fileName } = require("../modules/debug");
@@ -20,23 +21,40 @@ const {
   UserNotFound,
   Forbidden,
   Unauthorized,
+  UserNameAlreadyInUser,
 } = require("../modules/codes");
 
 module.exports = {
-  async create(email, name, password) {
+  async create(email, name, password, userName) {
     const user = await models.user.findOne({
       where: {
-        email: email,
+        [Op.or]: [
+          {
+            email: email,
+          },
+          {
+            userName: userName,
+          },
+        ],
       },
       raw: true,
     });
 
     if (user) {
-      return conflict({
-        status: "error",
-        code: EmailAlreadyInUse,
-        message: "Este endereço de email já foi cadastrado por outro usuário.",
-      });
+      if (email === user["email"]) {
+        return conflict({
+          status: "error",
+          code: EmailAlreadyInUse,
+          message: "Este endereço de email já foi cadastrado por outro usuário.",
+        });
+      }
+      if (userName === user["userName"]) {
+        return conflict({
+          status: "error",
+          code: UserNameAlreadyInUser,
+          message: "Este username já foi cadastrado por outro usuário.",
+        });
+      }
     } else {
       password = crypto.createHash("md5").update(password).digest("hex");
 
