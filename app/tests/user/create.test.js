@@ -83,6 +83,7 @@ describe("Criação de Usuário", () => {
       email: userEmail,
       name: userName,
       password: userPassword,
+      userName: userUserName,
     });
 
     expect(response.statusCode).toBe(409);
