@@ -24,6 +24,7 @@ describe("Criação de Usuário", () => {
   const userEmail = "novoemail@email.com";
   const userName = "Novo Nome de Usuário";
   const userPassword = "123456789";
+  const userUserName = "nomedeusuario";
 
   test("Não deve criar um usuário sem fornecer um email", async () => {
     const response = await request(app).post("/api/user").send({
@@ -52,11 +53,22 @@ describe("Criação de Usuário", () => {
     expect(response.statusCode).toBe(400);
   });
 
+  test("Não deve criar um usuário sem fornecer um nome de usuário", async () => {
+    const response = await request(app).post("/api/user").send({
+      email: userEmail,
+      name: userName,
+      password: userPassword,
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+
   test("Deve criar um novo usuário e retornar suas informações", async () => {
     const response = await request(app).post("/api/user").send({
       email: userEmail,
       name: userName,
       password: userPassword,
+      userName: userUserName,
     });
 
     expect(response.statusCode).toBe(201);
