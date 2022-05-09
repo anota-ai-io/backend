@@ -68,7 +68,7 @@ describe("Criação de Usuário", () => {
       email: userEmail,
       name: userName,
       password: userPassword,
-      userName: userUserName,
+      username: userUserName,
     });
 
     expect(response.statusCode).toBe(201);
@@ -83,7 +83,7 @@ describe("Criação de Usuário", () => {
       email: userEmail,
       name: userName,
       password: userPassword,
-      userName: userUserName,
+      username: userUserName,
     });
 
     expect(response.statusCode).toBe(409);
