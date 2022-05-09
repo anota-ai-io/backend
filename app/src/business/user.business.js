@@ -33,7 +33,7 @@ module.exports = {
             email: email,
           },
           {
-            userName: userName,
+            username: userName,
           },
         ],
       },
@@ -48,7 +48,7 @@ module.exports = {
           message: "Este endereço de email já foi cadastrado por outro usuário.",
         });
       }
-      if (userName === user["userName"]) {
+      if (userName === user["username"]) {
         return conflict({
           status: "error",
           code: UserNameAlreadyInUser,
@@ -65,6 +65,7 @@ module.exports = {
         name,
         password,
         activationCode,
+        username: userName,
       });
 
       if (user) {
