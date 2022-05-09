@@ -24,6 +24,7 @@ const config = async () => {
       password: crypto.createHash("md5").update("allanturing").digest("hex"),
       active: false,
       activationCode: "1234567812345678",
+      userName: "allanturing",
     },
     // A conta da Ada é utilizada para o teste de leitura de usuário e de login
     {
@@ -32,6 +33,7 @@ const config = async () => {
       password: crypto.createHash("md5").update("adalovelace").digest("hex"),
       active: true,
       activationCode: "1234567812345678",
+      userName: "adalovelace",
     },
     // A conta do Von Neumann deve permencer inativa para falhar no teste de login
     {
@@ -40,6 +42,7 @@ const config = async () => {
       password: crypto.createHash("md5").update("vonneumann").digest("hex"),
       active: false,
       activationCode: "1234567812345678",
+      userName: "vonneumann",
     },
     // A conta do Dennis é utilizada para o teste de remoção de usuário
     {
@@ -48,6 +51,7 @@ const config = async () => {
       password: crypto.createHash("md5").update("dennisritchie").digest("hex"),
       active: true,
       activationCode: "1234567812345678",
+      userName: "dennisritchie",
     },
   ];
 
