@@ -12,14 +12,14 @@ module.exports = {
   async create(req, res, next) {
     try {
       // Aquisição dos parâmetros
-      const { name, email, password, userName } = req.body;
+      const { name, email, password, username } = req.body;
 
       // Construir regras de validação
       const rules = [
         [name, NameValidator],
         [email, EmailValidator],
         [password, PasswordValidator],
-        [userName, UserNameValidator],
+        [username, UserNameValidator],
       ];
 
       // Validação dos parâmetros
@@ -30,7 +30,7 @@ module.exports = {
       }
 
       // Validação dos parâmetros finalizada
-      const response = await UserBusiness.create(email, name, password, userName);
+      const response = await UserBusiness.create(email, name, password, username);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
