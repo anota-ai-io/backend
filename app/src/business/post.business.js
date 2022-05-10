@@ -75,12 +75,22 @@ module.exports = {
             }
           );
         }
+
+        return {
+          id: post["dataValues"]["id"],
+          userId,
+          content,
+          hashtags,
+          images,
+        };
       });
 
       return ok({
         status: "ok",
         response: {
-          message: "Post criado com sucess",
+          post: {
+            ...result,
+          },
         },
       });
     } catch (error) {
