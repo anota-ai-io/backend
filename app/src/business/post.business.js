@@ -1,6 +1,8 @@
 const { DatabaseFailure } = require("../modules/codes");
 const { failure, ok } = require("../modules/http");
 const { models, sequelize } = require("../modules/sequelize");
+const { base64Encode } = require("../modules/base64");
+const fs = require("fs");
 
 module.exports = {
   async create(userId, content, hashtags, images) {
@@ -23,13 +25,18 @@ module.exports = {
           hashtagsId.push(hashtag[0]["dataValues"]["id"]);
         }
 
+        console.log("Hashtags Criadas", hashtagsId);
+
         // 2 - Criar cada uma das imagens
         const imagesId = [];
+        const imagesData = [];
 
         for (const imageContent of images) {
+          const base64 = base64Encode(imageContent["path"]);
+
           const image = await models.image.create(
             {
-              image: imageContent,
+              image: base64,
             },
             {
               transaction: t,
@@ -37,7 +44,10 @@ module.exports = {
           );
 
           imagesId.push(image["id"]);
+          imagesData.push(base64);
         }
+
+        console.log("Imagens Criadas", imagesId);
 
         // 3 - Criar o post
         const post = await models.post.create(
@@ -49,6 +59,8 @@ module.exports = {
             transaction: t,
           }
         );
+
+        console.log("Post Criado", post["dataValues"]["id"]);
 
         // 4 - Associar as hashtags com o post
         for (const hashId of hashtagsId) {
@@ -63,6 +75,8 @@ module.exports = {
           );
         }
 
+        console.log("Hashtags Associadas");
+
         // 5 - Associar as imagens com o post
         for (const imgId of imagesId) {
           await models.postImage.create(
@@ -76,12 +90,14 @@ module.exports = {
           );
         }
 
+        console.log("Imagens Associadas");
+
         return {
           id: post["dataValues"]["id"],
           userId,
           content,
           hashtags,
-          images,
+          images: [...imagesData],
         };
       });
 

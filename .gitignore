@@ -131,3 +131,4 @@ dist
 
 # Custom - Postgres persistent data
 postgres-data
+uploads

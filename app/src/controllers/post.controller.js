@@ -12,7 +12,9 @@ module.exports = {
       const userId = parseInt(token["id"]);
 
       // Aquisição dos parâmetros
-      const { content, hashtags, images } = req.body;
+      const { content } = req.body;
+      const hashtags = JSON.parse(req.body.hashtags);
+      const images = req.files;
 
       // Construir regras de validação
       // const rules = [
