@@ -8,8 +8,8 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true
     },
     image: {
-      type: DataTypes.TEXT,
-      allowNull: false
+      type: DataTypes.BLOB,
+      allowNull: true
     }
   }, {
     sequelize,

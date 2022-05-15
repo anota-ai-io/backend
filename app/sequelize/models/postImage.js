@@ -13,11 +13,7 @@ module.exports = function(sequelize, DataTypes) {
     imageId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'image',
-        key: 'id'
-      }
+      primaryKey: true
     }
   }, {
     sequelize,

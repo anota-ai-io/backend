@@ -2,7 +2,7 @@ const PasswordValidator = require("../validators/user/password.rules");
 const EmailValidator = require("../validators/user/email.rules");
 const NameValidator = require("../validators/user/name.rules");
 const UserIdValidator = require("../validators/user/id.rules");
-const UserNameValidator = require("../validators/user/userName.rules");
+const UserNameValidator = require("../validators/user/username.rules");
 
 const UserBusiness = require("../business/user.business");
 

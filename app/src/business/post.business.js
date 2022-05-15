@@ -32,16 +32,18 @@ module.exports = {
         const imagesData = [];
 
         for (const imageContent of images) {
-          const base64 = base64Encode(imageContent["path"]);
+          console.log(imageContent);
 
           const image = await models.image.create(
             {
-              image: base64,
+              image: imageContent,
             },
             {
               transaction: t,
             }
           );
+
+          const base64 = base64Encode(imageContent["destination"] + imageContent["filename"]);
 
           imagesId.push(image["id"]);
           imagesData.push(base64);
