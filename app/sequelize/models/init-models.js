@@ -15,9 +15,9 @@ function initModels(sequelize) {
 
   var post = _post(sequelize, DataTypes);
 
+  var comment = _comment(sequelize, DataTypes);
   var hashtag = _hashtag(sequelize, DataTypes);
   var image = _image(sequelize, DataTypes);
-  var comment = _comment(sequelize, DataTypes);
 
   var postHashtag = _postHashtag(sequelize, DataTypes);
   var postImage = _postImage(sequelize, DataTypes);

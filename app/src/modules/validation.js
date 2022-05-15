@@ -16,7 +16,17 @@ function run(rules) {
       if (options.hasOwnProperty("required")) required = options["required"];
     }
 
-    const result = rule.validate(field, required);
+    let result = null;
+
+    // Executa validações individuais caso parâmetro recebido seja uma Array
+    if (typeof field === "object") {
+      for (const element of field) {
+        result = rule.validate(element, required);
+        if (result["status"] === "error") break;
+      }
+    } else {
+      result = rule.validate(field, required);
+    }
 
     const error = result["status"] === "error";
 

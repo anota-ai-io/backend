@@ -2,6 +2,9 @@ const validation = require("../modules/validation");
 
 const PostBusiness = require("../business/post.business");
 
+const ContentValidator = require("../validators/post/content.rules");
+const HashtagValidator = require("../validators/post/hashtagh.rules");
+
 module.exports = {
   async create(req, res, next) {
     try {
@@ -17,23 +20,29 @@ module.exports = {
       const images = req.files;
 
       // Construir regras de validação
-      // const rules = [
-      //   [content, NameValidator],
-      //   [hashtags, EmailValidator],
-      //   [images, ImageValidator],
-      // ];
+      const rules = [
+        [content, ContentValidator],
+        [hashtags, HashtagValidator],
+      ];
 
-      // // Validação dos parâmetros
-      // const validationResult = validation.run(rules);
+      // Validação dos parâmetros
+      const validationResult = validation.run(rules);
 
-      // if (validationResult["status"] === "error") {
-      //   return res.status(400).json(validationResult);
-      // }
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
 
       // Validação dos parâmetros finalizada
       const response = await PostBusiness.create(userId, content, hashtags, images);
 
       return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  list(req, res, next) {
+    try {
     } catch (error) {
       next(error);
     }
