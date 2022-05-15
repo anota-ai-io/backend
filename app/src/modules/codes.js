@@ -1,4 +1,10 @@
 module.exports = {
+  // Código de retorno para status de operações bem sucedidas
+  OkStatus: "ok",
+
+  // Código de retorno para status de operações que não foram bem sucedidas
+  ErrorStatus: "error",
+
   // Erro interno de operação do sistema
   InternalServerError: "InternalServerError",
 

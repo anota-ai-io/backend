@@ -1,5 +1,6 @@
 var DataTypes = require("sequelize").DataTypes;
 var _comment = require("./comment");
+var _download = require("./download");
 var _hashtag = require("./hashtag");
 var _image = require("./image");
 var _post = require("./post");
@@ -7,21 +8,21 @@ var _postHashtag = require("./postHashtag");
 var _postImage = require("./postImage");
 var _postLike = require("./postLike");
 var _refreshToken = require("./refreshToken");
+var _share = require("./share");
 var _user = require("./user");
 
 function initModels(sequelize) {
   var user = _user(sequelize, DataTypes);
   var refreshToken = _refreshToken(sequelize, DataTypes);
-
   var post = _post(sequelize, DataTypes);
-
   var comment = _comment(sequelize, DataTypes);
+  var download = _download(sequelize, DataTypes);
   var hashtag = _hashtag(sequelize, DataTypes);
   var image = _image(sequelize, DataTypes);
-
   var postHashtag = _postHashtag(sequelize, DataTypes);
   var postImage = _postImage(sequelize, DataTypes);
   var postLike = _postLike(sequelize, DataTypes);
+  var share = _share(sequelize, DataTypes);
 
   hashtag.belongsToMany(post, {
     as: "postId_posts",
@@ -65,23 +66,32 @@ function initModels(sequelize) {
   image.hasMany(postImage, { as: "postImages", foreignKey: "imageId" });
   comment.belongsTo(post, { as: "post", foreignKey: "postId" });
   post.hasMany(comment, { as: "comments", foreignKey: "postId" });
+  download.belongsTo(post, { as: "post", foreignKey: "postId" });
+  post.hasMany(download, { as: "downloads", foreignKey: "postId" });
   postHashtag.belongsTo(post, { as: "post", foreignKey: "postId" });
   post.hasMany(postHashtag, { as: "postHashtags", foreignKey: "postId" });
   postImage.belongsTo(post, { as: "post", foreignKey: "postId" });
   post.hasMany(postImage, { as: "postImages", foreignKey: "postId" });
   postLike.belongsTo(post, { as: "post", foreignKey: "postId" });
   post.hasMany(postLike, { as: "postLikes", foreignKey: "postId" });
+  share.belongsTo(post, { as: "post", foreignKey: "postId" });
+  post.hasMany(share, { as: "shares", foreignKey: "postId" });
   comment.belongsTo(user, { as: "user", foreignKey: "userId" });
   user.hasMany(comment, { as: "comments", foreignKey: "userId" });
+  download.belongsTo(user, { as: "user", foreignKey: "userId" });
+  user.hasMany(download, { as: "downloads", foreignKey: "userId" });
   post.belongsTo(user, { as: "user", foreignKey: "userId" });
   user.hasMany(post, { as: "posts", foreignKey: "userId" });
   postLike.belongsTo(user, { as: "user", foreignKey: "userId" });
   user.hasMany(postLike, { as: "postLikes", foreignKey: "userId" });
   refreshToken.belongsTo(user, { as: "user", foreignKey: "userId" });
   user.hasMany(refreshToken, { as: "refreshTokens", foreignKey: "userId" });
+  share.belongsTo(user, { as: "user", foreignKey: "userId" });
+  user.hasMany(share, { as: "shares", foreignKey: "userId" });
 
   return {
     comment,
+    download,
     hashtag,
     image,
     post,
@@ -89,6 +99,7 @@ function initModels(sequelize) {
     postImage,
     postLike,
     refreshToken,
+    share,
     user,
   };
 }

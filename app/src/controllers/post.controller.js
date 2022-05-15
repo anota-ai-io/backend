@@ -16,12 +16,12 @@ module.exports = {
 
       // Aquisição dos parâmetros
       const { content } = req.body;
-      const hashtags = JSON.parse(req.body.hashtags);
+      const hashtags = req.body["hashtags"] ? JSON.parse(req.body.hashtags) : [];
       const images = req.files;
 
       // Construir regras de validação
       const rules = [
-        [content, ContentValidator],
+        [content, ContentValidator, { required: false }],
         [hashtags, HashtagValidator],
       ];
 

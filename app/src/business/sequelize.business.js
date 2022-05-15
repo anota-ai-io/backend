@@ -1,14 +1,14 @@
 const { sequelize } = require("../modules/sequelize");
 const { ok, failure } = require("../modules/http");
 const { SequelizeAuto } = require("sequelize-auto");
-const { DatabaseFailure } = require("../modules/codes");
+const { DatabaseFailure, OkStatus, ErrorStatus } = require("../modules/codes");
 
 module.exports = {
   async connection() {
     await sequelize.authenticate();
 
     return ok({
-      status: "ok",
+      status: OkStatus,
       response: {
         message: "Teste de conexão ao banco de dados realizada com sucesso.",
       },
@@ -29,7 +29,7 @@ module.exports = {
       .run()
       .then((data) => {
         response = ok({
-          status: "ok",
+          status: OkStatus,
           response: {
             message: "Modelos do banco de dados gerados com sucesso.",
           },
@@ -37,7 +37,7 @@ module.exports = {
       })
       .catch((error) => {
         response = failure({
-          status: "error",
+          status: ErrorStatus,
           code: DatabaseFailure,
           message: error.message,
         });
@@ -52,7 +52,7 @@ module.exports = {
     console.log("Push do banco de dados finalizado.");
 
     return ok({
-      status: "ok",
+      status: OkStatus,
       response: {
         message: "Push do banco de dados finalizado.",
       },
