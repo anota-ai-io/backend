@@ -1,5 +1,5 @@
-const { DatabaseFailure } = require("../modules/codes");
-const { failure, ok } = require("../modules/http");
+const { DatabaseFailure, IncorrectParameter } = require("../modules/codes");
+const { failure, ok, badRequest } = require("../modules/http");
 const { models, sequelize } = require("../modules/sequelize");
 const { base64Encode } = require("../modules/base64");
 const fs = require("fs");
@@ -7,6 +7,15 @@ const fs = require("fs");
 module.exports = {
   async create(userId, content, hashtags, images) {
     try {
+      if (!content && images.length === 0) {
+        return badRequest({
+          status: "error",
+          code: IncorrectParameter,
+          message:
+            "Para criar um post, é necessário informar um conteúdo ou uma (ou mais) imagens.",
+        });
+      }
+
       const result = await sequelize.transaction(async (t) => {
         // 1 - Criar cada uma das hashtags
         const hashtagsId = [];

@@ -4,7 +4,7 @@ const { validationError } = require("../../modules/validation");
 module.exports = {
   validate(input, required) {
     if (!input && required) {
-      return validationError("É necessário informar uma hashtag");
+      return validationError("É necessário informar ao menos uma hashtag");
     }
 
     if (input) {
