@@ -1,7 +1,9 @@
-const { DatabaseFailure, IncorrectParameter } = require("../modules/codes");
+const { DatabaseFailure, IncorrectParameter, ErrorStatus, OkStatus } = require("../modules/codes");
 const { failure, ok, badRequest } = require("../modules/http");
 const { models, sequelize } = require("../modules/sequelize");
-const { base64Encode } = require("../modules/base64");
+const { storage } = require("../services/firebase");
+const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+
 const fs = require("fs");
 
 module.exports = {
@@ -9,7 +11,7 @@ module.exports = {
     try {
       if (!content && images.length === 0) {
         return badRequest({
-          status: "error",
+          status: ErrorStatus,
           code: IncorrectParameter,
           message:
             "Para criar um post, é necessário informar um conteúdo ou uma (ou mais) imagens.",
@@ -41,21 +43,52 @@ module.exports = {
         const imagesData = [];
 
         for (const imageContent of images) {
-          console.log(imageContent);
+          const filename = imageContent["destination"] + imageContent["filename"];
+          const storageRef = ref(storage, filename);
+          const file = fs.readFileSync(filename);
 
-          const image = await models.image.create(
-            {
-              image: imageContent,
-            },
-            {
-              transaction: t,
-            }
-          );
+          await uploadBytes(storageRef, file)
+            .then(() => {
+              console.log("Upload de arquivo no Firebase Storage executado com sucesso.");
+            })
+            .catch((error) => {
+              console.log(`Falha no upload de arquivo no Firebase Storage: ${error.message}`);
+              console.log(error);
+            });
 
-          const base64 = base64Encode(imageContent["destination"] + imageContent["filename"]);
+          await getDownloadURL(storageRef)
+            .then(async (url) => {
+              console.log("URL de arquivo obtida com sucesso");
 
-          imagesId.push(image["id"]);
-          imagesData.push(base64);
+              const image = await models.image.create(
+                {
+                  url: url,
+                },
+                {
+                  transaction: t,
+                }
+              );
+
+              imagesId.push(image["id"]);
+              imagesData.push(url);
+            })
+            .catch((error) =>
+              console.log(`Falha na aquisição de URL de arquivo: ${error.message}`)
+            );
+
+          // Método antigo, uplaod via byte array e base64
+          // const imageData = fs.readFileSync(imageContent["destination"] + imageContent["filename"]);
+          // const image = await models.image.create(
+          //   {
+          //     image: imageData,
+          //   },
+          //   {
+          //     transaction: t,
+          //   }
+          // );
+          // const base64 = base64Encode(imageContent["destination"] + imageContent["filename"]);
+          // imagesId.push(image["id"]);
+          // imagesData.push(ImageData);
         }
 
         console.log("Imagens Criadas", imagesId);
@@ -113,7 +146,7 @@ module.exports = {
       });
 
       return ok({
-        status: "ok",
+        status: OkStatus,
         response: {
           post: {
             ...result,
@@ -122,7 +155,7 @@ module.exports = {
       });
     } catch (error) {
       return failure({
-        status: "error",
+        status: ErrorStatus,
         code: DatabaseFailure,
         message: `Falha na criação de post: ${error.message}`,
       });

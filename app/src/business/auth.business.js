@@ -13,6 +13,8 @@ const {
   DatabaseFailure,
   JWTFailure,
   Forbidden,
+  ErrorStatus,
+  OkStatus,
 } = require("../modules/codes");
 
 module.exports = {
@@ -51,7 +53,7 @@ module.exports = {
         }
       } else {
         return ok({
-          status: "error",
+          status: ErrorStatus,
           code: AccountNotVerified,
           message:
             "Para realizar o login, é necessário realizar a confirmação de cadastro via email.",
@@ -59,7 +61,7 @@ module.exports = {
       }
     } else {
       return unauthorized({
-        status: "error",
+        status: ErrorStatus,
         code: Unauthorized,
         message: "Usuário ou senha incorretos.",
       });
@@ -94,21 +96,21 @@ module.exports = {
       // Os objetos a seguir são objetos simples, e não objetos http
       if (activeUser) {
         return {
-          status: "ok",
+          status: OkStatus,
           response: {
             message: "Conta de usuário confirmada com sucesso.",
           },
         };
       } else {
         return {
-          status: "error",
+          status: ErrorStatus,
           error: DatabaseFailure,
           message: "Erro durante a confirmação de conta de usário.",
         };
       }
     } else {
       return {
-        status: "error",
+        status: ErrorStatus,
         code: IncorrectParameter,
         message: "Os dados de usuários ou de confirmação não são válidos.",
       };
@@ -144,7 +146,7 @@ module.exports = {
       // Verificação de autenticidade do refresh token informado
       if (userId !== parseInt(refresh["userId"]) || userEmail !== refresh["email"]) {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message:
             "Os dados presentes no token não são válidos com os dados presentes no refresh token.",
@@ -156,7 +158,7 @@ module.exports = {
 
       if (currentTime < parseInt(refresh["iat"])) {
         return ok({
-          status: "error",
+          status: ErrorStatus,
           code: RefreshTokenNotBefore,
           message:
             "O horário de criação do refresh token informado é anterior ao horário atual, ajuste o horário do seu dispositivo.",
@@ -165,7 +167,7 @@ module.exports = {
 
       if (currentTime > parseInt(refresh["exp"])) {
         return ok({
-          status: "error",
+          status: ErrorStatus,
           code: RefreshTokenExpired,
           message: "O refresh token informado expirou, realize o login novamente.",
         });
@@ -190,14 +192,14 @@ module.exports = {
         return ok(newToken);
       } else {
         return ok({
-          status: "ok",
+          status: OkStatus,
           code: JWTFailure,
           message: "Erro durante a criação de novo token de acesso através do refresh token.",
         });
       }
     } else {
       return ok({
-        status: "error",
+        status: ErrorStatus,
         code: InvalidRefreshToken,
         message: "O refresh token informado não foi encontrado na base de dados de autenticação.",
       });
@@ -232,7 +234,7 @@ module.exports = {
 
     if (refresh) {
       return {
-        status: "ok",
+        status: OkStatus,
         response: {
           accessToken: accessToken,
           refreshToken: randomToken,
@@ -240,7 +242,7 @@ module.exports = {
       };
     } else {
       return {
-        status: "error",
+        status: ErrorStatus,
         code: JWTFailure,
         message: "Não foi possível realizar o registro do refresh token criado.",
       };
@@ -266,21 +268,21 @@ module.exports = {
           return decoded;
         } else {
           return {
-            status: "error",
+            status: ErrorStatus,
             code: JWTFailure,
             message: "Dados de usuário presente no token não são válidos.",
           };
         }
       } catch (error) {
         return {
-          status: "error",
+          status: ErrorStatus,
           code: JWTFailure,
           message: `Erro ao validar token JWT: ${error.message}`,
         };
       }
     } else {
       return {
-        status: "error",
+        status: ErrorStatus,
         code: IncorrectParameter,
         message: "Nenhum token de autenticação informado.",
       };

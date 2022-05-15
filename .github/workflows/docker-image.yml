@@ -10,6 +10,12 @@ env:
   JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
   PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
   SEND_GRID_API: ${{ secrets.SEND_GRID_API }}
+  FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+  FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+  FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 
 jobs:
   build:
@@ -30,5 +36,11 @@ jobs:
           echo JWT_TOKEN_SECRET=${{ secrets.JWT_TOKEN_SECRET }} >> .env
           echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
           echo SEND_GRID_API=${{ secrets.SEND_GRID_API }} >> .env
+          echo FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} >> .env
+          echo FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }} >> .env
+          echo FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} >> .env
+          echo FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }} >> .env
+          echo FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} >> .env
+          echo FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }} >> .env
       - name: Build the Docker test image
         run: docker-compose -f docker-compose.test.yml up --exit-code-from backend_test --build

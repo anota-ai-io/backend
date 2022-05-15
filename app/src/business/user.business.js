@@ -5,6 +5,7 @@ const { Op } = require("sequelize");
 const mail = require("../services/mail");
 const { fileName } = require("../modules/debug");
 const { models, sequelize } = require("../modules/sequelize");
+const { OkStatus, ErrorStatus } = require("../modules/codes");
 
 const {
   conflict,
@@ -43,14 +44,14 @@ module.exports = {
     if (user) {
       if (email === user["email"]) {
         return conflict({
-          status: "error",
+          status: ErrorStatus,
           code: EmailAlreadyInUse,
           message: "Este endereço de email já foi cadastrado por outro usuário.",
         });
       }
       if (userName === user["username"]) {
         return conflict({
-          status: "error",
+          status: ErrorStatus,
           code: UserNameAlreadyInUser,
           message: "Este username já foi cadastrado por outro usuário.",
         });
@@ -86,14 +87,14 @@ module.exports = {
         }
 
         return created({
-          status: "ok",
+          status: OkStatus,
           response: {
             user: user,
           },
         });
       } else {
         return failure({
-          status: "error",
+          status: ErrorStatus,
           code: DatabaseFailure,
           message: "Não foi possível inserir o novo usuário no banco de dados.",
         });
@@ -154,28 +155,28 @@ module.exports = {
         // Verifica sucesso da exclusão
         if (deleted) {
           return ok({
-            status: "ok",
+            status: OkStatus,
             response: {
               message: "Conta e dados de usuário removidos com sucesso.",
             },
           });
         } else {
           return failure({
-            status: "error",
+            status: ErrorStatus,
             code: DatabaseFailure,
             message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
           });
         }
       } else {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
         });
       }
     } else {
       return unauthorized({
-        status: "error",
+        status: ErrorStatus,
         code: Unauthorized,
         message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
       });
@@ -198,21 +199,21 @@ module.exports = {
       // Verificar permissão de acesso aos dados desse usuário
       if (user["id"] == token["id"] && user["email"] === token["email"]) {
         return ok({
-          status: "ok",
+          status: OkStatus,
           response: {
             user: user,
           },
         });
       } else {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message: "Este usuário não possui permissão para acessar a informação solicitada.",
         });
       }
     } else {
       return notFound({
-        status: "error",
+        status: ErrorStatus,
         code: UserNotFound,
         message: "Este usuário não foi encontrado.",
       });
