@@ -17,6 +17,7 @@ module.exports = {
           attributes: ["id", "name", "username"],
         },
       ],
+      order: [["createdAt", "desc"]],
       offset: (page - 1) * FEED_PAGE_SIZE,
       limit: FEED_PAGE_SIZE,
       raw: true,
