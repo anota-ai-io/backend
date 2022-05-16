@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('share', {
+  return sequelize.define('postShare', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'share',
+    tableName: 'postShare',
     schema: 'public',
     timestamps: true,
     indexes: [

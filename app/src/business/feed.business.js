@@ -1,9 +1,7 @@
-const { models, sequelize } = require("../modules/sequelize");
-
+const { models } = require("../modules/sequelize");
 const { ok } = require("../modules/http");
 const { OkStatus } = require("../modules/codes");
 const { FEED_PAGE_SIZE } = require("../modules/constants");
-const { base64Encode } = require("../modules/base64");
 
 module.exports = {
   async get(userId, page) {
@@ -67,14 +65,49 @@ module.exports = {
         post["images"].push(image["image"]["url"]);
       }
 
-      // Versão antiga, com upload bia bytea e base64
-      // post["images"] = [];
-      // for (const image of images) {
-      //   console.log(image);
-      //   // const base64 = base64Encode(imageContent["destination"] + imageContent["filename"]);
-      //   const base64 = image["image"]["image"].toString("base64");
-      //   post["images"].push(base64);
-      // }
+      // Adquire quantidade de likes para esse post
+      const likes = await models.postLike.count({
+        where: {
+          postId: post["id"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["likesCounter"] = likes;
+
+      // Adquire quantidade de compartilhamentos para esse post
+      const shares = await models.postShare.count({
+        where: {
+          postId: post["id"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["sharesCounter"] = shares;
+
+      // Adquire quantidade de downloads para esse post
+      const downloads = await models.postDownload.count({
+        where: {
+          postId: post["id"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["downloadsCounter"] = downloads;
+
+      // Adquire quantidade de comentários para esse post
+      const comments = await models.postComment.count({
+        where: {
+          postId: post["id"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["commentsCounter"] = comments;
     }
 
     return ok({

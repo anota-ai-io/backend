@@ -1,10 +1,15 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('postLike', {
+  return sequelize.define('postDownload', {
+    id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'id'
@@ -13,7 +18,6 @@ module.exports = function(sequelize, DataTypes) {
     postId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'post',
         key: 'id'
@@ -21,16 +25,15 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'postLike',
+    tableName: 'postDownload',
     schema: 'public',
     timestamps: true,
     indexes: [
       {
-        name: "postLike_pkey",
+        name: "download_pkey",
         unique: true,
         fields: [
-          { name: "userId" },
-          { name: "postId" },
+          { name: "id" },
         ]
       },
     ]
