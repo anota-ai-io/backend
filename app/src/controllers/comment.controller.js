@@ -1,9 +1,9 @@
 const validation = require("../modules/validation");
 
-const PostBusiness = require("../business/post.business");
+const CommentBusiness = require("../business/comment.business");
 
 const ContentValidator = require("../validators/post/content.rules");
-const HashtagValidator = require("../validators/post/hashtagh.rules");
+const PostIdValidator = require("../validators/post/id.rules");
 
 module.exports = {
   async create(req, res, next) {
@@ -13,16 +13,15 @@ module.exports = {
 
       // Aquisição e validação de parâmetros
       const userId = parseInt(token["id"]);
+      const postId = parseInt(req.body["postId"]);
 
       // Aquisição dos parâmetros
       const { content } = req.body;
-      const hashtags = req.body["hashtags"] ? JSON.parse(req.body.hashtags) : [];
-      const images = req.files;
 
       // Construir regras de validação
       const rules = [
-        [content, ContentValidator, { required: false }],
-        [hashtags, HashtagValidator],
+        [postId, PostIdValidator],
+        [content, ContentValidator],
       ];
 
       // Validação dos parâmetros
@@ -33,7 +32,7 @@ module.exports = {
       }
 
       // Validação dos parâmetros finalizada
-      const response = await PostBusiness.create(userId, content, hashtags, images);
+      const response = await CommentBusiness.create(userId, postId, content);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
@@ -43,26 +42,22 @@ module.exports = {
 
   async list(req, res, next) {
     try {
-      // Aquisição do Token
-      const { token } = req;
-
-      const { page, userId, hashtag, content } = req.query;
+      // Aquisição e validação de parâmetros
+      const postId = parseInt(req.query["postId"]);
+      const page = parseInt(req.query["page"]);
 
       // Construir regras de validação
-      // const rules = [
-      //   [content, ContentValidator, { required: false }],
-      //   [hashtags, HashtagValidator],
-      // ];
+      const rules = [[postId, PostIdValidator]];
 
-      // // Validação dos parâmetros
-      // const validationResult = validation.run(rules);
+      // Validação dos parâmetros
+      const validationResult = validation.run(rules);
 
-      // if (validationResult["status"] === "error") {
-      //   return res.status(400).json(validationResult);
-      // }
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
 
       // Validação dos parâmetros finalizada
-      const response = await PostBusiness.create(page, userId, hashtag, content);
+      const response = await CommentBusiness.list(postId, page);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

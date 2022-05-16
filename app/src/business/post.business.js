@@ -75,20 +75,6 @@ module.exports = {
             .catch((error) =>
               console.log(`Falha na aquisição de URL de arquivo: ${error.message}`)
             );
-
-          // Método antigo, uplaod via byte array e base64
-          // const imageData = fs.readFileSync(imageContent["destination"] + imageContent["filename"]);
-          // const image = await models.image.create(
-          //   {
-          //     image: imageData,
-          //   },
-          //   {
-          //     transaction: t,
-          //   }
-          // );
-          // const base64 = base64Encode(imageContent["destination"] + imageContent["filename"]);
-          // imagesId.push(image["id"]);
-          // imagesData.push(ImageData);
         }
 
         console.log("Imagens Criadas", imagesId);
@@ -161,4 +147,6 @@ module.exports = {
       });
     }
   },
+
+  async list(page, userId, username, hashtag, hashtagId, content) {},
 };
