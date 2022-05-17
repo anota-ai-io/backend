@@ -2,7 +2,7 @@ const validation = require("../modules/validation");
 
 const CommentBusiness = require("../business/comment.business");
 
-const ContentValidator = require("../validators/post/content.rules");
+const ContentValidator = require("../validators/comment/content.rules");
 const PostIdValidator = require("../validators/post/id.rules");
 
 module.exports = {

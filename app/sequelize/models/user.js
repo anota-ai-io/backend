@@ -31,6 +31,18 @@ module.exports = function(sequelize, DataTypes) {
     username: {
       type: DataTypes.STRING(64),
       allowNull: true
+    },
+    occupation: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    profilePicture: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
   }, {
     sequelize,
