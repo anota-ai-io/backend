@@ -1,5 +1,5 @@
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/posts/" });
 
 const controller = require("../controllers/post.controller");
 const { protectedRoute } = require("../middlewares/auth");
