@@ -14,7 +14,7 @@ module.exports = {
         {
           model: models.user,
           as: "user",
-          attributes: ["id", "name", "username"],
+          attributes: ["id", "name", "username", "profilePicture"],
         },
       ],
       order: [["createdAt", "desc"]],

@@ -41,6 +41,7 @@ module.exports = {
           id: parseInt(user["id"]),
           email: user["email"],
           name: user["name"],
+          profilePicture: user["profilePicture"],
         };
 
         // Criar o token relacionado a esta operação de login
