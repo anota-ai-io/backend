@@ -24,20 +24,25 @@ module.exports = {
         },
       });
 
-      if (like) {
-        return ok({
-          status: OkStatus,
-          response: {
-            message: "Operação de like registrada com sucesso.",
+      const likesCounter = await models.postLike.count({
+        where: {
+          postId,
+        },
+        raw: true,
+      });
+
+      console.log(likesCounter);
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "Operação de like registrada com sucesso.",
+          post: {
+            postId,
+            likesCounter,
           },
-        });
-      } else {
-        return failure({
-          status: ErrorStatus,
-          code: DatabaseFailure,
-          message: "Não foi possível registrar a operação de like.",
-        });
-      }
+        },
+      });
     } else {
       return ok({
         status: ErrorStatus,

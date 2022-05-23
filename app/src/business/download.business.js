@@ -18,20 +18,23 @@ module.exports = {
         userId,
       });
 
-      if (download) {
-        return ok({
-          status: OkStatus,
-          response: {
-            message: "Operação de download registrada com sucesso.",
+      const downloadsCounter = await models.postDownload.count({
+        where: {
+          postId,
+        },
+        raw: true,
+      });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "Operação de download registrada com sucesso.",
+          post: {
+            postId,
+            downloadsCounter,
           },
-        });
-      } else {
-        return failure({
-          status: ErrorStatus,
-          code: DatabaseFailure,
-          message: "Não foi possível registrar a operação de download.",
-        });
-      }
+        },
+      });
     } else {
       return ok({
         status: ErrorStatus,

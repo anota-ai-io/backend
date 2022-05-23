@@ -18,20 +18,23 @@ module.exports = {
         userId,
       });
 
-      if (download) {
-        return ok({
-          status: OkStatus,
-          response: {
-            message: "Operação de compartilhamento registrada com sucesso.",
+      const sharesCounter = await models.postShare.count({
+        where: {
+          postId,
+        },
+        raw: true,
+      });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "Operação de compartilhamento registrada com sucesso.",
+          post: {
+            postId,
+            sharesCounter,
           },
-        });
-      } else {
-        return failure({
-          status: ErrorStatus,
-          code: DatabaseFailure,
-          message: "Não foi possível registrar a operação de compartilhamento.",
-        });
-      }
+        },
+      });
     } else {
       return ok({
         status: ErrorStatus,
