@@ -4,6 +4,7 @@ const PostBusiness = require("../business/post.business");
 
 const ContentValidator = require("../validators/post/content.rules");
 const HashtagValidator = require("../validators/post/hashtagh.rules");
+const PostIdValidator = require("../validators/post/id.rules");
 
 module.exports = {
   async create(req, res, next) {
@@ -63,6 +64,28 @@ module.exports = {
 
       // Validação dos parâmetros finalizada
       const response = await PostBusiness.create(page, userId, hashtag, content);
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async read(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const rules = [[id, PostIdValidator]];
+
+      // Validação dos parâmetros
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      // Validação dos parâmetros finalizada
+      const response = await PostBusiness.read(id);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

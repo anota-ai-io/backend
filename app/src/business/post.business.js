@@ -1,5 +1,11 @@
-const { DatabaseFailure, IncorrectParameter, ErrorStatus, OkStatus } = require("../modules/codes");
-const { failure, ok, badRequest } = require("../modules/http");
+const {
+  DatabaseFailure,
+  IncorrectParameter,
+  ErrorStatus,
+  OkStatus,
+  NotFound,
+} = require("../modules/codes");
+const { failure, ok, badRequest, notFound } = require("../modules/http");
 const { models, sequelize } = require("../modules/sequelize");
 const { storage } = require("../services/firebase");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
@@ -149,4 +155,146 @@ module.exports = {
   },
 
   async list(page, userId, username, hashtag, hashtagId, content) {},
+
+  async read(postId) {
+    const post = await models.post.findOne({
+      attributes: ["id", "content", "createdAt"],
+      where: {
+        id: postId,
+      },
+      include: [
+        {
+          model: models.user,
+          as: "user",
+          attributes: ["id", "name", "username", "profilePicture"],
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
+
+    if (post) {
+      // Adquire hashtags relacionadas com o post
+      const hashtags = await models.postHashtag.findAll({
+        attributes: [],
+        where: {
+          postId,
+        },
+        include: {
+          model: models.hashtag,
+          as: "hashtag",
+          attributes: ["id", "name"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["hashtags"] = [];
+      for (const hashtag of hashtags) {
+        post["hashtags"].push({ ...hashtag["hashtag"] });
+      }
+
+      // Adquire imagens relacionadas com o post
+      const images = await models.postImage.findAll({
+        attributes: [],
+        where: {
+          postId,
+        },
+        include: {
+          model: models.image,
+          as: "image",
+          attributes: ["url"],
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["images"] = [];
+      for (const image of images) {
+        post["images"].push(image["image"]["url"]);
+      }
+
+      const comments = await models.comment.findAll({
+        attributes: ["content", "createdAt"],
+        include: [
+          {
+            model: models.postComment,
+            as: "postComments",
+            required: true,
+            attributes: [],
+            where: {
+              postId,
+            },
+          },
+          {
+            model: models.user,
+            as: "user",
+            attributes: ["id", "name", "username", "email", "profilePicture"],
+          },
+        ],
+
+        raw: true,
+        nest: true,
+      });
+
+      post["comments"] = comments;
+
+      // Adquire quantidade de likes para esse post
+      const likes = await models.postLike.count({
+        where: {
+          postId,
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["likesCounter"] = likes;
+
+      // Adquire quantidade de compartilhamentos para esse post
+      const shares = await models.postShare.count({
+        where: {
+          postId,
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["sharesCounter"] = shares;
+
+      // Adquire quantidade de downloads para esse post
+      const downloads = await models.postDownload.count({
+        where: {
+          postId,
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["downloadsCounter"] = downloads;
+
+      // Adquire quantidade de comentários para esse post
+      const commentsCounter = await models.postComment.count({
+        where: {
+          postId,
+        },
+        raw: true,
+        nest: true,
+      });
+
+      post["commentsCounter"] = commentsCounter;
+
+      return ok({
+        status: OkStatus,
+        response: {
+          post: { ...post },
+        },
+      });
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O Post informado não foi encontrado",
+      });
+    }
+  },
 };
