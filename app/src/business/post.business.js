@@ -215,7 +215,7 @@ module.exports = {
       }
 
       const comments = await models.comment.findAll({
-        attributes: ["content", "createdAt"],
+        attributes: ["id", "content", "createdAt"],
         include: [
           {
             model: models.postComment,

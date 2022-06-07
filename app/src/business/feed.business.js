@@ -109,6 +109,17 @@ module.exports = {
       });
 
       post["commentsCounter"] = comments;
+
+      // Verifica se esse usuário deu like nesse post
+      const liked = await models.postLike.findOne({
+        where: {
+          postId: post["id"],
+          userId,
+        },
+        raw: true,
+      });
+
+      post["liked"] = liked ? true : false;
     }
 
     return ok({

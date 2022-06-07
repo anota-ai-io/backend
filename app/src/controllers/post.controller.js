@@ -63,7 +63,7 @@ module.exports = {
       // }
 
       // Validação dos parâmetros finalizada
-      const response = await PostBusiness.create(page, userId, hashtag, content);
+      const response = await PostBusiness.list(page, userId, hashtag, content);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
