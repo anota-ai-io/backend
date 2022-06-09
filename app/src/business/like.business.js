@@ -31,8 +31,6 @@ module.exports = {
         raw: true,
       });
 
-      console.log(likesCounter);
-
       return ok({
         status: OkStatus,
         response: {
@@ -63,27 +61,30 @@ module.exports = {
     });
 
     if (post) {
-      const like = await models.postLike.destroy({
+      const deslike = await models.postLike.destroy({
         where: {
           postId,
           userId,
         },
       });
 
-      if (like) {
-        return ok({
-          status: OkStatus,
-          response: {
-            message: "Operação de deslike registrada com sucesso.",
+      const likesCounter = await models.postLike.count({
+        where: {
+          postId,
+        },
+        raw: true,
+      });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "Operação de deslike registrada com sucesso.",
+          post: {
+            postId,
+            likesCounter,
           },
-        });
-      } else {
-        return failure({
-          status: ErrorStatus,
-          code: DatabaseFailure,
-          message: "Não foi possível registrar a operação de deslike.",
-        });
-      }
+        },
+      });
     } else {
       return ok({
         status: ErrorStatus,
