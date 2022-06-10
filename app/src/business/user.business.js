@@ -225,6 +225,7 @@ module.exports = {
   },
 
   async edit(token, name, username, occupation, bio, profilePicture) {
+    console.log("Editando");
     const userId = parseInt(token["id"]);
 
     if (!name && !username && !occupation && !bio && !profilePicture) {
@@ -245,26 +246,27 @@ module.exports = {
     if (bio) newUser["bio"] = bio;
 
     // Alteração do campo de foto de perfil
-    const filename = profilePicture["destination"] + profilePicture["filename"];
-    const storageRef = ref(storage, filename);
-    const file = fs.readFileSync(filename);
+    if (profilePicture) {
+      const filename = profilePicture["destination"] + profilePicture["filename"];
+      const storageRef = ref(storage, filename);
+      const file = fs.readFileSync(filename);
 
-    await uploadBytes(storageRef, file)
-      .then(() => {
-        console.log("Upload de arquivo no Firebase Storage executado com sucesso.");
-      })
-      .catch((error) => {
-        console.log(`Falha no upload de arquivo no Firebase Storage: ${error.message}`);
-        console.log(error);
-      });
+      await uploadBytes(storageRef, file)
+        .then(() => {
+          console.log("Upload de arquivo no Firebase Storage executado com sucesso.");
+        })
+        .catch((error) => {
+          console.log(`Falha no upload de arquivo no Firebase Storage: ${error.message}`);
+          console.log(error);
+        });
 
-    await getDownloadURL(storageRef)
-      .then(async (url) => {
-        console.log("URL de arquivo obtida com sucesso");
-        newUser["profilePicture"] = url;
-      })
-      .catch((error) => console.log(`Falha na aquisição de URL de arquivo: ${error.message}`));
-
+      await getDownloadURL(storageRef)
+        .then(async (url) => {
+          console.log("URL de arquivo obtida com sucesso");
+          newUser["profilePicture"] = url;
+        })
+        .catch((error) => console.log(`Falha na aquisição de URL de arquivo: ${error.message}`));
+    }
     // Realiza alterações
     const user = await models.user.update(newUser, {
       where: {
