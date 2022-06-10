@@ -103,8 +103,6 @@ module.exports = {
       const { name, username, occupation, bio } = req.body;
       const profilePicture = req.file;
 
-      console.log(profilePicture);
-
       const rules = [
         [name, NameValidator, { required: false }],
         [username, UserNameValidator, { required: false }],
