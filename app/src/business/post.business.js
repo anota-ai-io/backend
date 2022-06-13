@@ -28,8 +28,16 @@ module.exports = {
       let hashtags = [];
 
       if (content) {
-        const splited = content.split(" ");
+        let contentHold = "";
+
+        contentHold = content.replace(new RegExp("\n", "g"), " ");
+        contentHold = contentHold.replace(new RegExp("\r", "g"), " ");
+        contentHold = contentHold.replace(new RegExp("#", "g"), " #");
+
+        const splited = contentHold.split(" ");
         hashtags = splited.filter((word) => word[0] === "#");
+
+        hashtags = [...new Set(hashtags)];
       }
 
       const result = await sequelize.transaction(async (t) => {
