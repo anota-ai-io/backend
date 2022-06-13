@@ -13,7 +13,7 @@ const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
 
 module.exports = {
-  async create(userId, content, hashtags, images) {
+  async create(userId, content, images) {
     try {
       if (!content && images.length === 0) {
         return badRequest({
@@ -22,6 +22,14 @@ module.exports = {
           message:
             "Para criar um post, é necessário informar um conteúdo ou uma (ou mais) imagens.",
         });
+      }
+
+      // Realizar extração das hashtags do conteúdo dos posts
+      let hashtags = [];
+
+      if (content) {
+        const splited = content.split(" ");
+        hashtags = splited.filter((word) => word[0] === "#");
       }
 
       const result = await sequelize.transaction(async (t) => {
