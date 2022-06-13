@@ -17,14 +17,10 @@ module.exports = {
 
       // Aquisição dos parâmetros
       const { content } = req.body;
-      const hashtags = req.body["hashtags"] ? JSON.parse(req.body.hashtags) : [];
       const images = req.files;
 
       // Construir regras de validação
-      const rules = [
-        [content, ContentValidator, { required: false }],
-        [hashtags, HashtagValidator],
-      ];
+      const rules = [[content, ContentValidator, { required: false }]];
 
       // Validação dos parâmetros
       const validationResult = validation.run(rules);
@@ -34,7 +30,7 @@ module.exports = {
       }
 
       // Validação dos parâmetros finalizada
-      const response = await PostBusiness.create(userId, content, hashtags, images);
+      const response = await PostBusiness.create(userId, content, images);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
