@@ -172,7 +172,7 @@ module.exports = {
 
   async list(page, userId, username, hashtag, hashtagId, content) {},
 
-  async read(postId) {
+  async read(postId, userId) {
     const post = await models.post.findOne({
       attributes: ["id", "content", "createdAt"],
       where: {
@@ -298,6 +298,17 @@ module.exports = {
       });
 
       post["commentsCounter"] = commentsCounter;
+
+      // Verifica se esse usuário deu like nesse post
+      const liked = await models.postLike.findOne({
+        where: {
+          postId: post["id"],
+          userId,
+        },
+        raw: true,
+      });
+
+      post["liked"] = liked ? true : false;
 
       return ok({
         status: OkStatus,
