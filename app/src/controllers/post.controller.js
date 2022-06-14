@@ -69,9 +69,13 @@ module.exports = {
 
   async read(req, res, next) {
     try {
+      const { token } = req;
+
       const { id } = req.params;
 
       const rules = [[id, PostIdValidator]];
+
+      const userId = parseInt(token["id"]);
 
       // Validação dos parâmetros
       const validationResult = validation.run(rules);
@@ -81,7 +85,7 @@ module.exports = {
       }
 
       // Validação dos parâmetros finalizada
-      const response = await PostBusiness.read(id);
+      const response = await PostBusiness.read(id, userId);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
