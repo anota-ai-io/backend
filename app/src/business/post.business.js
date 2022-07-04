@@ -324,4 +324,30 @@ module.exports = {
       });
     }
   },
+
+  async delete(postId) {
+    const result = models.post.destroy({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (result){
+      return ok({
+        status: OkStatus,
+        response: {
+          post: { postId: postId },
+        },
+      });
+    }
+
+    return badRequest({
+      status: ErrorStatus,
+      code: IncorrectParameter,
+      message:
+        "Não foi possível deletar o post.",
+    });
+
+  }
+
 };
