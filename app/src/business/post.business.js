@@ -4,11 +4,13 @@ const {
   ErrorStatus,
   OkStatus,
   NotFound,
+  Forbidden,
 } = require("../modules/codes");
-const { failure, ok, badRequest, notFound } = require("../modules/http");
+const { failure, ok, badRequest, notFound, forbidden } = require("../modules/http");
 const { models, sequelize } = require("../modules/sequelize");
 const { storage } = require("../services/firebase");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
+const { Op } = require("sequelize");
 
 const fs = require("fs");
 
@@ -321,6 +323,185 @@ module.exports = {
         status: ErrorStatus,
         code: NotFound,
         message: "O Post informado não foi encontrado",
+      });
+    }
+  },
+
+  async delete(postId, userId) {
+    // Ordem para apagar:
+
+    // - Relacionamento entre comentários e post (postComment)
+    // - Comentários (comment)
+    // - Relacionamento entre imagens e post (postImage)
+    // - Imagens (image)
+    // - Relacionamento entre post e hashtags (postHashtag)
+    // - Contador de likes e shares
+    // - Post
+
+    const postOwner = await models.post.findOne({
+      attributes: ["userId"],
+      where: {
+        id: postId,
+      },
+      raw: true,
+    });
+
+    if (postOwner.userId === userId) {
+      const result = await sequelize.transaction(async (t) => {
+        // Adquirir ID dos comentários que precisam ser apagados
+        const comments = await models.postComment.findAll(
+          {
+            attributes: ["commentId"],
+            where: {
+              postId,
+            },
+            raw: true,
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        const commentsToDestroy = comments.map((comment) => comment.commentId);
+
+        // Remover o relacionamento entre post e comentário (postComment)
+        await models.postComment.destroy(
+          {
+            where: {
+              postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Remover os comentários desse post
+        await models.comment.destroy(
+          {
+            where: {
+              id: {
+                [Op.in]: commentsToDestroy,
+              },
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Adquirir ID das imagens a serem removidas
+        const images = await models.postImage.findAll(
+          {
+            attributes: ["imageId"],
+            where: {
+              postId,
+            },
+            raw: true,
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        const imagesToDestroy = images.map((image) => image.imageId);
+
+        // Remover o relacionamento entre post e imagem (postImage)
+        await models.postImage.destroy(
+          {
+            where: {
+              postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Remover imagens
+        await models.image.destroy(
+          {
+            where: {
+              id: {
+                [Op.in]: imagesToDestroy,
+              },
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Remover relacionamento entre post e hashtags (postHashtags)
+        await models.postHashtag.destroy(
+          {
+            where: {
+              postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Remover os registros de Likes
+        await models.postLike.destroy(
+          {
+            where: {
+              postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Remover os registros de compartilhamentos
+        await models.postShare.destroy(
+          {
+            where: {
+              postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        // Por fim, remover o post (já era hora né)
+        await models.post.destroy(
+          {
+            where: {
+              id: postId,
+            },
+          },
+          {
+            transaction: t,
+          }
+        );
+
+        return true;
+      });
+
+      if (result) {
+        return ok({
+          status: OkStatus,
+          response: {
+            post: { postId: postId },
+          },
+        });
+      } else {
+        return failure({
+          status: ErrorStatus,
+          code: DatabaseFailure,
+          message: "Não foi possível deletar o post.",
+        });
+      }
+    } else {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário não possui permissão para executar a ação solicitada.",
       });
     }
   },
