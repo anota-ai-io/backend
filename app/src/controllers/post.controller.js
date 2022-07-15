@@ -93,23 +93,21 @@ module.exports = {
     }
   },
 
-  async delete(req, res, next){
-    try{
+  async delete(req, res, next) {
+    try {
       const { token } = req;
 
       const { id } = req.params;
 
-      const rules = [[id, PostIdValidator]]
+      const rules = [[id, PostIdValidator]];
 
-      const userId =parseInt(token["id"]);
+      const userId = parseInt(token["id"]);
 
       const response = await PostBusiness.delete(id, userId);
 
       return res.status(response.statusCode).json(response.body);
-
-    } catch (error){
+    } catch (error) {
       next(error);
     }
-  }
-
+  },
 };
