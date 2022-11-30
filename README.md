@@ -21,7 +21,7 @@ Anota Aí é um projeto de faculdade para compartilhamento colaborativo de mater
 - Banco de Dados: [PostgreSQL](https://www.postgresql.org/)
 - Interface com o banco de dados: [Sequelize](https://sequelize.org/)
 - Testes: Suíte de testes escrita com o [Jest](https://jestjs.io/pt-BR/)
-- CI/CD: Integração com deploy automático no Heroku e [Github Actions](https://github.com/anota-ai-io/backend/actions)
+- CI/CD: Integração com deploy automático no Render
 - Ambiente de desenvolvimento e testes: [Docker](https://www.docker.com/)
 
 ## Documentação
@@ -36,9 +36,9 @@ O deploy do frontend está disponível no Netlify através [deste link](https://
 
 ## Disponibilidade
 
-A API encontra-se disponível hospedada no Heroku através do link: [API Anota Aí](https://anotaifsp.herokuapp.com).
+A API encontra-se disponível hospedada no Render através do link: [API Anota Aí](https://anotaai.onrender.com).
 
-Hospedagens gratuitas no Heroku entram em modo de sleeping após 30 minutos sem nenhum trafégo. Esteja ciente de que a primeira requisição pode levar alguns segundos a mais. Após acordar, o servidor responde as chamadas subsequentes normalmente.
+Hospedagens gratuitas no Render entram em modo de sleeping após 30 minutos sem nenhum trafégo. Esteja ciente de que a primeira requisição pode levar alguns segundos a mais. Após acordar, o servidor responde as chamadas subsequentes normalmente.
 
 ## Testes
 
